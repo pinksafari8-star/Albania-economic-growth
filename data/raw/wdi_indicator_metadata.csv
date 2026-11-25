@@ -1,0 +1,12 @@
+wdi_code,column,retrieved
+BX.KLT.DINV.WD.GD.ZS,fdi_pct_gdp,2026-11-25
+BX.KLT.DINV.CD.WD,fdi_usd,2026-11-25
+NY.GDP.MKTP.KD.ZG,gdp_growth_pct,2026-11-25
+NY.GDP.PCAP.KD,gdp_pc_const_usd,2026-11-25
+NY.GDP.PCAP.PP.KD,gdp_pc_ppp_const,2026-11-25
+NE.CON.PRVT.PC.KD,hh_consumption_pc,2026-11-25
+SL.UEM.TOTL.ZS,unemployment_pct,2026-11-25
+SL.UEM.1524.ZS,youth_unemployment_pct,2026-11-25
+FP.CPI.TOTL.ZG,inflation_pct,2026-11-25
+BX.TRF.PWKR.DT.GD.ZS,remittances_pct_gdp,2026-11-25
+SP.POP.TOTL,population,2026-11-25
