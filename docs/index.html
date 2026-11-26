@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDI, Growth and Living Standards in Albania, 2010–2025</title>
+<meta name="description" content="Advanced Mathematics project: has foreign direct investment contributed to Albania's growth, and has growth improved ordinary citizens' living standards?">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+ <a href="#intro">Introduction</a><a href="#question">Question</a><a href="#background">Background</a><a href="#data">Data</a>
+ <a href="#methods">Methods</a><a href="#analysis1">Analysis 1</a><a href="#analysis2">Analysis 2</a>
+ <a href="#discussion">Discussion</a><a href="#limits">Limitations</a><a href="#conclusion">Conclusion</a><a href="#refs">References</a>
+</nav>
+<header>
+ <h1>Foreign Direct Investment, Economic Growth and Living Standards in Albania, 2010–2025</h1>
+ <p>Advanced Mathematics project · Vrije Universiteit Brussel · by Ergita</p>
+ <p>Data: World Bank World Development Indicators · Analysis: Python (pandas, SciPy, Matplotlib)</p>
+</header>
+<main>
+
+<section id="intro">
+<h2>1. Introduction</h2>
+<p>Albania has attracted a steady stream of foreign direct investment (FDI) and has recorded positive economic growth in almost every year since 2010. Governments often point to such numbers as proof of success. But a national total is not the same as a household's experience: an economy can grow while many people feel little change. This project tests that gap with real data.</p>
+<div class="kpis">
+ <div class="kpi"><b>+92%</b><span>Real GDP per capita, 2010→2025</span></div>
+ <div class="kpi"><b>+72%</b><span>Household consumption per capita, 2010→2025</span></div>
+ <div class="kpi"><b>r = −0.21</b><span>FDI/GDP vs GDP growth (not significant)</span></div>
+ <div class="kpi"><b>−19%</b><span>Population, 2010→2025</span></div>
+</div>
+</section>
+
+<section id="question">
+<h2>2. Research question and objectives</h2>
+<p><strong>Question.</strong> <em>Has foreign direct investment contributed to Albania's economic growth, and has this growth translated into improved living standards for ordinary citizens?</em></p>
+<p>To make this measurable, it is split into two parts:</p>
+<ol>
+ <li><strong>Objective 1.</strong> Is the FDI share of GDP statistically associated with annual real GDP growth in Albania, 2010–2025?</li>
+ <li><strong>Objective 2.</strong> Did growth in output per person carry through to household consumption per person, and what do labour-market and price indicators add?</li>
+</ol>
+<p class="note">With 16 yearly observations of one country, this project can show <em>associations</em>. It cannot prove that FDI <em>caused</em> growth, or that anything caused changes in living standards.</p>
+</section>
+
+<section id="background">
+<h2>3. Background: Albania and the Flamingo Revolution</h2>
+<p>Since the end of communism, Albania has moved from a closed economy to an open, middle-income one that relies on tourism, services, construction, remittances and foreign capital. Sustained emigration has shrunk its population: according to the World Bank series used here, it fell from about 2.91 million in 2010 to about 2.35 million in 2025.</p>
+<p>In 2026 Albania saw a large protest movement, widely called the <em>Flamingo Revolution</em>. According to press reports, it began around late May 2026 as opposition to a planned luxury resort development reportedly linked to Jared Kushner in the protected Vjosa-Narta wetland area, home to flamingos and other wildlife. It later widened into broader protests about corruption, transparency and the political system, and a student-led wave followed in October. Some commentators describe it as a challenge to investor-led development and to inequality; the government and others may see it differently, and accounts differ on details. See the references for the sources.</p>
+<p class="note"><strong>Important limit.</strong> Our data run to 2025, so they end <em>before</em> the movement. The statistics here cannot say anything about what caused the protests or what they will change. The movement matters only as context: it shows that the relationship between foreign-backed investment, growth and ordinary people's interests is a live public debate in Albania.</p>
+</section>
+
+<section id="data">
+<h2>4. Data sources</h2>
+<p>All series come from the World Bank <em>World Development Indicators</em> (WDI), downloaded for Albania, 2010–2025, using the World Bank API (script <code>src/01_fetch_data.py</code>, retrieved 25 November 2026). There were no missing values in the 16 years.</p>
+<div class="scroll"><table>
+<thead><tr><th>Variable</th><th>WDI code</th><th>Role</th></tr></thead><tbody>
+<tr><td>FDI, net inflows (% of GDP)</td><td>BX.KLT.DINV.WD.GD.ZS</td><td>Main explanatory variable</td></tr>
+<tr><td>FDI, net inflows (current US$)</td><td>BX.KLT.DINV.CD.WD</td><td>Robustness check</td></tr>
+<tr><td>GDP growth (annual %)</td><td>NY.GDP.MKTP.KD.ZG</td><td>Economic growth</td></tr>
+<tr><td>GDP per capita (constant 2015 US$)</td><td>NY.GDP.PCAP.KD</td><td>Output per person</td></tr>
+<tr><td>Household consumption per capita (constant 2015 US$)</td><td>NE.CON.PRVT.PC.KD</td><td>Living-standards proxy</td></tr>
+<tr><td>Unemployment, total and youth (% of labour force, ILO modelled)</td><td>SL.UEM.TOTL.ZS, SL.UEM.1524.ZS</td><td>Labour market</td></tr>
+<tr><td>Inflation, consumer prices (annual %)</td><td>FP.CPI.TOTL.ZG</td><td>Prices</td></tr>
+<tr><td>Personal remittances received (% of GDP)</td><td>BX.TRF.PWKR.DT.GD.ZS</td><td>Context</td></tr>
+<tr><td>Population, total</td><td>SP.POP.TOTL</td><td>Context and per-capita effects</td></tr>
+</tbody></table></div>
+<p><strong>Not included.</strong> Average wages, median income and inequality measures are not available as a consistent annual WDI series for Albania. INSTAT (Albania's statistical institute) publishes wage data, but I did not use them, so the project uses household consumption per person as its main living-standards measure and states this limit openly.</p>
+<p><button id="toggle-data">Show the data table (2010–2025)</button></p>
+<div id="data-box" class="scroll" hidden><table><thead><tr><th>Year</th><th>FDI (% GDP)</th><th>GDP growth (%)</th><th>GDP p.c. (const. US$)</th><th>Household cons. p.c. (const. US$)</th><th>Unemployment (%)</th><th>Inflation (%)</th><th>Population</th></tr></thead><tbody><tr><td>2010</td><td>9.02</td><td>2.97</td><td>3,580</td><td>2,796</td><td>14.1</td><td>3.6</td><td>2,913,021</td></tr><tr><td>2011</td><td>8.08</td><td>2.46</td><td>3,678</td><td>2,856</td><td>13.5</td><td>3.4</td><td>2,905,195</td></tr><tr><td>2012</td><td>7.50</td><td>0.98</td><td>3,772</td><td>2,916</td><td>13.4</td><td>2.0</td><td>2,860,708</td></tr><tr><td>2013</td><td>9.80</td><td>1.71</td><td>3,896</td><td>2,983</td><td>15.9</td><td>1.9</td><td>2,816,902</td></tr><tr><td>2014</td><td>8.65</td><td>2.24</td><td>4,045</td><td>3,156</td><td>18.1</td><td>1.6</td><td>2,773,767</td></tr><tr><td>2015</td><td>8.63</td><td>2.23</td><td>4,200</td><td>3,260</td><td>17.2</td><td>1.9</td><td>2,731,293</td></tr><tr><td>2016</td><td>8.71</td><td>3.91</td><td>4,432</td><td>3,444</td><td>15.4</td><td>1.3</td><td>2,689,469</td></tr><tr><td>2017</td><td>7.71</td><td>3.28</td><td>4,648</td><td>3,510</td><td>13.6</td><td>2.0</td><td>2,648,285</td></tr><tr><td>2018</td><td>7.83</td><td>3.67</td><td>4,894</td><td>3,669</td><td>12.3</td><td>2.0</td><td>2,607,733</td></tr><tr><td>2019</td><td>7.71</td><td>2.06</td><td>5,072</td><td>3,846</td><td>11.5</td><td>1.4</td><td>2,567,801</td></tr><tr><td>2020</td><td>7.02</td><td>-3.31</td><td>4,981</td><td>3,687</td><td>11.6</td><td>1.6</td><td>2,528,480</td></tr><tr><td>2021</td><td>6.76</td><td>8.97</td><td>5,512</td><td>3,915</td><td>11.5</td><td>2.0</td><td>2,489,762</td></tr><tr><td>2022</td><td>7.58</td><td>4.83</td><td>5,868</td><td>4,214</td><td>10.8</td><td>6.7</td><td>2,451,636</td></tr><tr><td>2023</td><td>6.90</td><td>4.02</td><td>6,204</td><td>4,402</td><td>10.7</td><td>4.8</td><td>2,411,658</td></tr><tr><td>2024</td><td>6.33</td><td>4.05</td><td>6,549</td><td>4,630</td><td>10.7</td><td>2.2</td><td>2,377,128</td></tr><tr><td>2025</td><td>6.06</td><td>3.79</td><td>6,877</td><td>4,814</td><td>10.9</td><td>2.1</td><td>2,349,580</td></tr></tbody></table></div>
+</section>
+
+<section id="methods">
+<h2>5. Methodology</h2>
+<ul>
+ <li><strong>Percentage change and CAGR.</strong> Compound annual growth rate: CAGR = (V<sub>end</sub> / V<sub>start</sub>)<sup>1/n</sup> − 1, where n is the number of years.</li>
+ <li><strong>Index numbers.</strong> Index<sub>t</sub> = 100 × V<sub>t</sub> / V<sub>2010</sub>, so different variables can be compared on one scale.</li>
+ <li><strong>Pearson correlation.</strong> r = Σ(x<sub>i</sub> − x̄)(y<sub>i</sub> − ȳ) / √[Σ(x<sub>i</sub> − x̄)² Σ(y<sub>i</sub> − ȳ)²]; Spearman's ρ is the same idea on ranks.</li>
+ <li><strong>Simple linear regression (OLS).</strong> y = a + b·x + error, where b = Σ(x<sub>i</sub> − x̄)(y<sub>i</sub> − ȳ) / Σ(x<sub>i</sub> − x̄)², a = ȳ − b·x̄, and R² is the share of the variation in y that the line accounts for. 95% confidence intervals use the t-distribution with n − 2 degrees of freedom.</li>
+</ul>
+<p>Everything was computed in Python (<code>pandas</code>, <code>SciPy</code>, <code>Matplotlib</code>) and can be reproduced with the scripts in the repository.</p>
+</section>
+
+<section id="analysis1">
+<h2>6. Analysis 1: Is FDI associated with economic growth?</h2>
+<p>Across 2010–2025, FDI net inflows averaged 7.8% of GDP (range 6.1%–9.8%) while real GDP growth averaged 3.0% per year (standard deviation 2.5 percentage points). The FDI share has trended <em>downward</em> by about 0.17 percentage points per year (p = 0.0002).</p>
+<div class="scroll"><table>
+<thead><tr><th>Specification</th><th>n</th><th>Pearson r</th><th>p-value</th><th>Slope (pp growth per +1 pp FDI/GDP)</th><th>95% CI of slope</th><th>R²</th></tr></thead><tbody>
+<tr><td>Same year, 2010–2025</td><td>16</td><td>−0.21</td><td>0.43</td><td>−0.51</td><td>−1.87 to 0.84</td><td>0.05</td></tr>
+<tr><td>FDI lagged one year</td><td>15</td><td>−0.31</td><td>0.27</td><td>−0.83</td><td>−2.36 to 0.71</td><td>0.09</td></tr>
+<tr><td>Same year, excluding 2020–21 (COVID)</td><td>14</td><td>−0.46</td><td>0.096</td><td>−0.49</td><td>−1.08 to 0.10</td><td>0.21</td></tr>
+</tbody></table></div>
+<p>As an additional check, FDI measured in US$ billions had a Pearson correlation of 0.34 (p = 0.20) and a Spearman rank correlation of 0.55 (p = 0.027) with growth. Because both series trend over time and dollar amounts are not adjusted for the size of the economy, I treat that result with caution; it is one of several tests, and the share-of-GDP version is the more meaningful measure.</p>
+<figure><img src="assets/figure1_fdi_vs_growth.png" alt="Figure 1: FDI share of GDP and real GDP growth in Albania, time series and scatter plot">
+<figcaption><strong>Figure 1.</strong> (a) FDI (% of GDP) and real GDP growth, 2010–2025. (b) Scatter plot with fitted regression line. <a href="assets/figure1_fdi_vs_growth.pdf">Download PDF</a></figcaption></figure>
+<p><strong>Interpretation.</strong> In none of the specifications is there a statistically significant <em>positive</em> association between the FDI share of GDP and growth; point estimates are slightly negative but their confidence intervals comfortably include zero. With only 14–16 observations, the test has little power, so this is not evidence that FDI is unhelpful; it is that these national yearly data show no clear link. Growth swings, especially the 2020 contraction (−3.3%) and 2021 rebound (+9.0%), are dominated by the pandemic rather than by FDI.</p>
+</section>
+
+<section id="analysis2">
+<h2>7. Analysis 2: Did growth reach households?</h2>
+<div class="scroll"><table>
+<thead><tr><th>Indicator</th><th>Total change 2010→2025</th><th>CAGR 2010–2025</th><th>CAGR 2010–2019</th><th>CAGR 2019–2025</th></tr></thead><tbody>
+<tr><td>Real GDP per capita</td><td>+92.1%</td><td>4.45%</td><td>3.95%</td><td>5.20%</td></tr>
+<tr><td>Household consumption per capita</td><td>+72.2%</td><td>3.69%</td><td>3.61%</td><td>3.81%</td></tr>
+<tr><td>Real total GDP</td><td>+55.0%</td><td>2.96%</td><td>2.50%</td><td>3.66%</td></tr>
+<tr><td>Population</td><td>−19.3%</td><td>−1.42%</td><td>−1.39%</td><td>−1.47%</td></tr>
+</tbody></table></div>
+<ul>
+ <li>Annual growth in household consumption per person closely tracks growth in GDP per person: slope 0.86 (95% CI 0.49 to 1.22), r = 0.81, R² = 0.66, p &lt; 0.001, n = 15.</li>
+ <li>But the <em>level</em> of consumption fell relative to output: household consumption per person was 78.1% of GDP per person in 2010, 75.8% in 2019 and 70.0% in 2025.</li>
+ <li>Unemployment rose from 14.1% (2010) to a peak of 18.1% (2014), then fell to 10.9% (2025); youth unemployment moved from 30.9% to 39.6% to 25.6%.</li>
+ <li>Consumer prices rose by an estimated cumulative 44.1% between 2010 and 2025, including a 6.7% spike in 2022. Consumption figures are already in constant prices, but households experience price jumps directly.</li>
+ <li>Remittances fell from 13.1% to 8.4% of GDP.</li>
+</ul>
+<figure><img src="assets/figure2_growth_vs_living_standards.png" alt="Figure 2: indexed GDP per capita, household consumption, total GDP and population, and the consumption-to-GDP ratio with unemployment">
+<figcaption><strong>Figure 2.</strong> (a) Indices (2010 = 100). (b) Household consumption as a share of GDP per capita, with the unemployment rate. <a href="assets/figure2_growth_vs_living_standards.pdf">Download PDF</a></figcaption></figure>
+<p><strong>Interpretation.</strong> Average living standards, as proxied by household consumption per person, clearly rose: by about 72% in real terms. So the "growth gap" is not that growth failed to reach households entirely. Rather, consumption per person grew more slowly than output per person (+72% vs +92%), and its share fell by 8 percentage points. Part of the rise in GDP per person is arithmetic: the population shrank by 19%, while total real GDP grew by 55%. Per-person figures are national averages and say nothing about how gains were distributed.</p>
+</section>
+
+<section id="discussion">
+<h2>8. Discussion</h2>
+<p>Taking the two parts together: (1) no clear statistical link appears between FDI intensity and growth in these data, and (2) average household consumption rose substantially but less than output per person. Several explanations are consistent with this, but <strong>this project cannot test them</strong>: GDP includes profits that foreign investors may send abroad; investment, exports or saving may have taken a bigger share of output; consumption per person is an average that could hide unequal gains; and emigration and remittances change who is counted and how households cope.</p>
+<p>What the data <em>can</em> support is a cautious message: national growth and foreign investment totals are not enough to show how ordinary people are doing. To judge the gap the Flamingo Revolution points to, one would need distributional data (median income, wages, poverty and inequality, housing costs) and, for causal claims about FDI, firm-level or regional data and a proper identification strategy. I make no claim that the protests changed, or were caused by, any of the trends above.</p>
+</section>
+
+<section id="limits">
+<h2>9. Limitations</h2>
+<ul>
+ <li><strong>Small sample:</strong> 16 annual observations; low statistical power and wide confidence intervals.</li>
+ <li><strong>Correlation, not causation:</strong> no control variables; omitted factors (tourism, construction, earthquakes, COVID, remittances) affect both FDI and growth.</li>
+ <li><strong>Averages only:</strong> no information on inequality, wages or poverty; consumption per capita is a proxy for living standards, not a direct measure.</li>
+ <li><strong>Data quality:</strong> FDI is measured in balance-of-payments terms and can be revised; unemployment is an ILO modelled estimate; WDI values are revised over time (retrieved 25 Nov 2026).</li>
+ <li><strong>Time-series issues:</strong> trends and shared shocks (COVID) can create or hide correlations; I did not run formal tests such as Granger causality or cointegration.</li>
+ <li><strong>Timing:</strong> data end in 2025, before the Flamingo Revolution.</li>
+ <li><strong>Multiple tests:</strong> I report several specifications; the one nominally significant result (Spearman, FDI in US$) should not be over-read.</li>
+</ul>
+</section>
+
+<section id="conclusion">
+<h2>10. Conclusion</h2>
+<p>Between 2010 and 2025, Albania's real GDP per person nearly doubled and average household consumption per person rose by about 72%. Yet the data do not show a statistically clear link between the FDI share of GDP and annual growth, and household consumption grew more slowly than output per person. Together this suggests that headline growth and FDI numbers give an incomplete picture of ordinary people's economic situation. The data cannot establish causes, and further work with distributional and wage data is needed to assess who benefited.</p>
+</section>
+
+<section id="refs">
+<h2>11. References</h2>
+<ol class="refs">
+ <li>World Bank. <em>World Development Indicators</em>, Albania, indicators listed in section 4. <a href="https://data.worldbank.org">data.worldbank.org</a>. Accessed 25 November 2026 via the World Bank API.</li>
+ <li>Hobbs, S., Paparas, D., &amp; AboElsoud, M. E. (2021). Does Foreign Direct Investment and Trade Promote Economic Growth? Evidence from Albania. <em>Economies, 9</em>(1), 1. https://doi.org/10.3390/economies9010001 (further reading on the Albanian FDI–growth literature).</li>
+ <li>Hoxhaj, M., &amp; Pulaj, I. (2022). An Overview of Foreign Direct Investment in Albania. <em>European Journal of Business &amp; Management Research, 7</em>(4), 256–260. https://doi.org/10.24018/ejbmr.2022.7.4.1542 (further reading).</li>
+ <li>BirdLife International (4 June 2026). Albania's flamingo protests: When a government sells off a wetland, it's selling off democracy too. <a href="https://www.birdlife.org/news/2026/06/04/albanias-flamingo-protests-when-a-government-sells-off-a-wetland-its-selling-off-democracy-too/">birdlife.org</a>.</li>
+ <li>Waging Nonviolence (June 2026). Inside Albania's youth-led 'flamingo revolution'. <a href="https://wagingnonviolence.org/2026/06/inside-albania-flamingo-revolution-kushner/">wagingnonviolence.org</a>.</li>
+ <li>Democracy Now! (21 October 2026). Flamingo Revolution: Albania protests escalate over corruption &amp; Kushner/Trump luxury resort. <a href="https://www.democracynow.org/2026/10/21/albania_protests_edi_rama">democracynow.org</a>.</li>
+ <li>Wikipedia. Flamingo Revolution. <a href="https://en.wikipedia.org/wiki/Flamingo_Revolution">en.wikipedia.org/wiki/Flamingo_Revolution</a> (used only for orientation; accessed 25 November 2026).</li>
+</ol>
+</section>
+</main>
+<footer>Code, data and reproducible analysis: <a href="REPO_URL_PLACEHOLDER">GitHub repository</a> · Individual project, Advanced Mathematics, VUB.</footer>
+<script src="script.js"></script>
+</body>
+</html>
